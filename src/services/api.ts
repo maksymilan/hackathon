@@ -1,38 +1,12 @@
-import type { APIRequest, APIResponse } from '../types';
+// src/services/api.ts (已修复和重构)
 
-// src/services/api.ts (在文件末尾增加新的函数)
+import type { APIRequest, APIResponse, CardData, ProfileData } from '../types';
 
-// ... callRealAPI 函数保持不变 ...
-
-import type { CardData, ProfileData } from '../types';
-
-export const getCards = async (): Promise<CardData[]> => {
-    const response = await fetch(`${API_BASE_URL}/cards`);
-    return response.json();
-};
-
-export const toggleFavorite = async (cardId: string): Promise<CardData> => {
-    const response = await fetch(`${API_BASE_URL}/cards/${cardId}/favorite`, { method: 'POST' });
-    return response.json();
-};
-
-export const getProfile = async (): Promise<ProfileData> => {
-    const response = await fetch(`${API_BASE_URL}/profile`);
-    return response.json();
-};
-
-export const updateProfile = async (profileData: ProfileData): Promise<ProfileData> => {
-    const response = await fetch(`${API_BASE_URL}/profile`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profileData),
-    });
-    return response.json();
-};
-
+// 1. 将API地址定义在文件顶部
 const API_BASE_URL = 'http://localhost:8000/api';
 
-export const callRealAPI = async (request: APIRequest): Promise<APIResponse> => {
+// 2. 统一的聊天API调用函数
+export const callChatAPI = async (request: APIRequest): Promise<APIResponse> => {
     try {
         const response = await fetch(`${API_BASE_URL}/chat`, {
             method: 'POST',
@@ -46,7 +20,61 @@ export const callRealAPI = async (request: APIRequest): Promise<APIResponse> => 
         }
         return await response.json();
     } catch (error) {
-        console.error("API call failed:", error);
-        return { text: `抱歉，连接AI导师时出现了一点问题: ${error}` };
+        console.error("Chat API call failed:", error);
+        return { 
+            text: `抱歉，连接AI导师时出现了一点问题: ${error}`,
+            // 出错时返回空数组，防止UI崩溃
+            learningPath: [], 
+            chatHistory: [] 
+        };
+    }
+};
+
+// 3. 其他独立的API调用函数
+export const getCards = async (): Promise<CardData[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/cards`);
+        if (!response.ok) throw new Error('Failed to fetch cards');
+        return await response.json(); // 修复了这里，正确解析JSON
+    } catch (error) {
+        console.error("Get cards failed:", error);
+        return []; // 出错时返回空数组
+    }
+};
+
+export const toggleFavorite = async (cardId: string): Promise<CardData | null> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/cards/${cardId}/favorite`, { method: 'POST' });
+        if (!response.ok) throw new Error('Failed to toggle favorite');
+        return await response.json();
+    } catch (error) {
+        console.error("Toggle favorite failed:", error);
+        return null;
+    }
+};
+
+export const getProfile = async (): Promise<ProfileData | null> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/profile`);
+        if (!response.ok) throw new Error('Failed to fetch profile');
+        return await response.json();
+    } catch (error) {
+        console.error("Get profile failed:", error);
+        return null;
+    }
+};
+
+export const updateProfile = async (profileData: ProfileData): Promise<ProfileData | null> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/profile`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(profileData),
+        });
+        if (!response.ok) throw new Error('Failed to update profile');
+        return await response.json();
+    } catch (error) {
+        console.error("Update profile failed:", error);
+        return null;
     }
 };
