@@ -6,8 +6,9 @@ import NavigationBar from './components/NavigationBar';
 import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
 import ChatSpace from './pages/ChatSpace';
+import { UserProvider } from './contexts/UserContext';
 
-// AppLayout 现在是所有页面的“外壳”
+// AppLayout 现在是所有页面的"外壳"
 const AppLayout: React.FC = () => (
   <div className="app-container"> {/* 新增一个总容器 */}
     <NavigationBar />
@@ -19,16 +20,18 @@ const AppLayout: React.FC = () => (
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        {/* --- 关键修改：将ChatSpace也移入AppLayout中 --- */}
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/chat/:topic" element={<ChatSpace />} />
-        </Route>
-      </Routes>
-    </Router>
+    <UserProvider>
+      <Router>
+        <Routes>
+          {/* --- 关键修改：将ChatSpace也移入AppLayout中 --- */}
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/chat/:topic" element={<ChatSpace />} />
+          </Route>
+        </Routes>
+      </Router>
+    </UserProvider>
   );
 };
 

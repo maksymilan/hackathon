@@ -30,6 +30,7 @@ export interface CardData {
   title: string;
   description: string;
   isFavorite: boolean;
+  imageUrl?: string;
 }
 
 export interface ProfileData {

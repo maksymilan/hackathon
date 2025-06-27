@@ -34,34 +34,49 @@ const ChatSpace: React.FC = () => {
     }, [topic]);
 
     const handleUserSubmit = async (text: string) => {
+        if (!text.trim()) return;
+
         const topicIdToSubmit = currentTopicId || 0;
         const newUserMessage: ChatMessage = { id: Date.now(), text, sender: 'user' };
-        
+
+        // 步骤 1: 立即将用户消息添加到UI，这是唯一一次添加用户消息
         setChatHistories(prev => ({
             ...prev,
             [topicIdToSubmit]: [...(prev[topicIdToSubmit] || []), newUserMessage]
         }));
         setIsThinking(true);
-        
-        const response = await callRealAPI({ type: 'message', text });
-        
-        setIsThinking(false);
 
-        const newAiMessage: ChatMessage = {id: Date.now(), text: response.text, sender: 'ai'};
+        try {
+            const response = await callRealAPI({ type: 'message', text });
+            
+            // 只有在API成功返回后才创建AI消息
+            const newAiMessage: ChatMessage = { id: Date.now() + 1, text: response.text, sender: 'ai' };
 
-        if (response.learningPath) {
-            setLearningPath(response.learningPath);
+            // 步骤 2: 只把AI的新消息追加到列表末尾
             setChatHistories(prev => ({
                 ...prev,
                 [topicIdToSubmit]: [...(prev[topicIdToSubmit] || []), newAiMessage]
             }));
-        } else if (response.chatHistory) {
-            setChatHistories(prev => ({...prev, [topicIdToSubmit]: response.chatHistory!}));
-        } else {
+
+            // 如果有新的学习路径，则更新它
+            if (response.learningPath) {
+                setLearningPath(response.learningPath);
+            }
+
+        } catch (error) {
+            console.error("API call failed:", error);
+            const errorAiMessage: ChatMessage = {
+                id: Date.now() + 1,
+                sender: 'ai',
+                text: "抱歉，我好像暂时连接不上服务器，请稍后再试。"
+            };
+            // 步骤 3: 即使出错，也只追加错误消息
             setChatHistories(prev => ({
                 ...prev,
-                [topicIdToSubmit]: [...(prev[topicIdToSubmit] || []), newAiMessage]
+                [topicIdToSubmit]: [...(prev[topicIdToSubmit] || []), errorAiMessage]
             }));
+        } finally {
+            setIsThinking(false);
         }
     };
   
@@ -109,7 +124,12 @@ const ChatSpace: React.FC = () => {
 </button>
                     {/* <button onClick={handleReset} className="reset-button">新会话</button> */}
                 </div>
-                <ChatWindow messages={currentMessages} onSubmit={handleUserSubmit} isThinking={isThinking} />
+                <ChatWindow 
+                  messages={currentMessages} 
+                  onSubmit={handleUserSubmit} 
+                  isThinking={isThinking} 
+                  assistantName={`${topic}学习助手`} 
+                />
             </main>
             <aside className="toolbox">
                 <h2>工具箱</h2>

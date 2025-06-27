@@ -8,9 +8,10 @@ interface ChatWindowProps {
   messages: ChatMessage[];
   onSubmit: (text: string) => void;
   isThinking: boolean;
+  assistantName?: string;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ messages, onSubmit, isThinking }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, onSubmit, isThinking, assistantName }) => {
   const [input, setInput] = useState('');
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -24,7 +25,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, onSubmit, isThinking 
   const handleInput = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      // --- 关键修改：修复了这里的拼写错误 ---
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
@@ -47,12 +47,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, onSubmit, isThinking 
   };
 
   return (
-    <>
+    <div className="chat-window-outer">
       <div className="chat-box" ref={chatBoxRef}>
-        {messages.map(msg => <Message key={msg.id} message={msg} />)}
-        {isThinking && <div className="message ai-message thinking">AI 正在思考中...</div>}
+        {messages.map(msg => <Message key={msg.id} message={msg} assistantName={assistantName} />)}
+        {isThinking && <div className="ai-message thinking">AI 正在思考中</div>}
       </div>
-      
       <div className="chat-form-container">
         <form className="chat-form-gemini" onSubmit={handleSubmit}>
           <textarea
@@ -71,7 +70,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ messages, onSubmit, isThinking 
           </button>
         </form>
       </div>
-    </>
+    </div>
   );
 };
 

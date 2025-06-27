@@ -9,13 +9,20 @@ import type { ChatMessage } from '../types';
 
 interface MessageProps {
   message: ChatMessage;
+  assistantName?: string;
 }
 
-const Message: React.FC<MessageProps> = ({ message }) => {
+const Message: React.FC<MessageProps> = ({ message, assistantName = 'AI助手' }) => {
   const messageClass = message.sender === 'ai' ? 'ai-message' : 'user-message';
 
   return (
     <div className={`message ${messageClass}`}>
+      {message.sender === 'ai' && (
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+          <span style={{ fontSize: 20, marginRight: 8 }}>🤖</span>
+          <span style={{ fontWeight: 600, color: 'var(--primary-color)', fontSize: 15 }}>{assistantName}</span>
+        </div>
+      )}
       <ReactMarkdown
         children={message.text}
         remarkPlugins={[remarkGfm]}

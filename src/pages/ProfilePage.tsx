@@ -1,48 +1,41 @@
 // src/pages/ProfilePage.tsx (最终功能完整版)
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { getProfile, updateProfile, getCards, toggleFavorite } from '../services/api';
-import type { ProfileData, CardData } from '../types';
-import Card from '../components/Card'; // 复用我们之前创建的卡片组件
+import React, { useState, useEffect } from 'react';
+import { updateProfile, getCards, toggleFavorite } from '../services/api';
+import type { CardData } from '../types';
+import Card from '../components/Card';
+import { useUser } from '../contexts/UserContext'; // 引入 useUser
 
 // 可供选择的兴趣领域
 const INTEREST_OPTIONS = ["Python", "数据科学", "Web开发", "游戏开发", "网络爬虫", "人工智能"];
 
 const ProfilePage: React.FC = () => {
-  // --- State Management ---
-  // 用于存储从后端获取的原始数据
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const { profile, isLoading: isProfileLoading, refreshProfile } = useUser(); // 从Context获取用户数据
   const [cards, setCards] = useState<CardData[]>([]);
-  // 用于绑定表单的临时编辑状态
-  const [editableProfile, setEditableProfile] = useState<ProfileData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [editableProfile, setEditableProfile] = useState(profile);
+  const [isCardsLoading, setIsCardsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState('');
 
-  // --- Data Fetching ---
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // 并发获取个人资料和卡片列表
-      const [profileData, cardsData] = await Promise.all([
-        getProfile(),
-        getCards()
-      ]);
-      setProfile(profileData);
-      setEditableProfile(profileData); // 初始化可编辑的profile
-      setCards(cardsData);
-    } catch (error) {
-      console.error("Failed to fetch page data:", error);
-      setStatusMessage("数据加载失败，请稍后再试。");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  useEffect(() => {
+    // 当 context 中的 profile 更新时，同步到可编辑状态
+    setEditableProfile(profile);
+  }, [profile]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const fetchCards = async () => {
+      try {
+        setIsCardsLoading(true);
+        const cardsData = await getCards();
+        setCards(cardsData);
+      } catch (error) {
+        console.error("Failed to fetch cards:", error);
+      } finally {
+        setIsCardsLoading(false);
+      }
+    };
+    fetchCards();
+  }, []);
 
-  // --- Event Handlers ---
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!editableProfile) return;
     setEditableProfile({ ...editableProfile, [e.target.name]: e.target.value });
@@ -61,10 +54,9 @@ const ProfilePage: React.FC = () => {
     if (!editableProfile) return;
     setStatusMessage('正在保存...');
     try {
-      const updatedProfile = await updateProfile(editableProfile);
-      setProfile(updatedProfile);
-      setEditableProfile(updatedProfile);
+      await updateProfile(editableProfile);
       setStatusMessage('个人资料已成功保存！');
+      refreshProfile(); // 关键：保存成功后，调用 context 的刷新方法
     } catch (error) {
       setStatusMessage('保存失败，请重试。');
     }
@@ -73,7 +65,6 @@ const ProfilePage: React.FC = () => {
   const handleToggleFavorite = async (cardId: string) => {
     try {
         await toggleFavorite(cardId);
-        // 重新获取所有卡片数据以刷新收藏状态
         const cardsData = await getCards();
         setCards(cardsData);
     } catch (error) {
@@ -81,9 +72,7 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-
-  // --- Render Logic ---
-  if (isLoading) {
+  if (isProfileLoading || isCardsLoading) {
     return <div className="page-container">加载中...</div>;
   }
 
