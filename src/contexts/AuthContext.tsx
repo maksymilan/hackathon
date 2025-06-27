@@ -9,28 +9,31 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
+function getInitialAuth() {
+  const savedUser = localStorage.getItem('auth-user');
+  const savedLogin = localStorage.getItem('auth-logged-in');
+  return {
+    isLoggedIn: !!savedUser && savedLogin === 'true',
+    username: savedUser || null
+  };
+}
 
-  useEffect(() => {
-    const saved = localStorage.getItem('auth-user');
-    if (saved) {
-      setUsername(saved);
-      setIsLoggedIn(true);
-    }
-  }, []);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => getInitialAuth().isLoggedIn);
+  const [username, setUsername] = useState<string | null>(() => getInitialAuth().username);
 
   const login = (name: string) => {
     setUsername(name);
     setIsLoggedIn(true);
     localStorage.setItem('auth-user', name);
+    localStorage.setItem('auth-logged-in', 'true');
   };
 
   const logout = () => {
     setUsername(null);
     setIsLoggedIn(false);
     localStorage.removeItem('auth-user');
+    localStorage.removeItem('auth-logged-in');
   };
 
   return (
