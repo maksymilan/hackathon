@@ -1,0 +1,386 @@
+/* 全局与基础样式 */
+:root {
+    --primary-color: #4a90e2;
+    --background-color: #f4f7f9;
+    --card-bg-color: #ffffff;
+    --text-color: #333;
+    --ai-message-bg: #e9f2fc;
+    --user-message-bg: #ffffff;
+    --border-color: #e0e0e0;
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.6;
+}
+a { text-decoration: none; color: inherit; }
+
+/* 首页 (index.html) */
+.dashboard {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+    text-align: center;
+}
+.dashboard header { margin-bottom: 40px; }
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+.card {
+    background: var(--card-bg-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: left;
+    border: 1px solid var(--border-color);
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+.card h2 { margin-top: 0; color: var(--primary-color); }
+
+/* 聊天应用布局 (chat.html) */
+.app-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    height: 100vh;
+    gap: 1px;
+    background-color: var(--border-color);
+}
+.sidebar, .chat-container, .toolbox {
+    background-color: var(--card-bg-color);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px);
+}
+.chat-container { background-color: #f9fbfd; }
+
+/* 左侧栏：学习路径 */
+.sidebar h2 { margin-top: 0; }
+#learning-path-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#learning-path-list li {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: 1px solid transparent;
+}
+#learning-path-list li:before {
+    margin-right: 10px;
+    font-weight: bold;
+}
+/* 路径状态样式 */
+.path-item.locked {
+    color: #999;
+    cursor: not-allowed;
+    background-color: #f5f5f5;
+}
+.path-item.locked:before { content: '🔒'; }
+.path-item.unlocked {
+    border: 1px dashed var(--primary-color);
+}
+.path-item.unlocked:hover { background-color: var(--ai-message-bg); }
+.path-item.unlocked:before { content: '▶️'; }
+.path-item.in-progress {
+    background-color: var(--ai-message-bg);
+    border: 1px solid var(--primary-color);
+    font-weight: bold;
+}
+.path-item.in-progress:before { content: '💬'; }
+.path-item.completed {
+    text-decoration: line-through;
+    color: #555;
+}
+.path-item.completed:before { content: '✔️'; }
+
+
+/* 中间：聊天窗口 */
+.chat-header { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+.chat-header h2 { margin: 0; font-size: 1.2em; }
+.chat-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px 0;
+}
+.message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    margin-bottom: 12px;
+    clear: both;
+}
+.ai-message {
+    background-color: var(--ai-message-bg);
+    border-bottom-left-radius: 4px;
+    float: left;
+}
+.user-message {
+    background-color: var(--primary-color);
+    color: white;
+    border-bottom-right-radius: 4px;
+    float: right;
+}
+.message.thinking {
+    color: #777;
+    font-style: italic;
+}
+.chat-form {
+    display: flex;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+}
+#user-input {
+    flex-grow: 1;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 1em;
+}
+#user-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+.chat-form button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 8px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+/* 右侧栏：工具箱 */
+.toolbox .tool-placeholder {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    color: #777;
+    text-align: center;
+}
+
+.main-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.nav-logo { font-weight: bold; font-size: 1.5rem; }
+.nav-links a { margin-left: 1.5rem; text-decoration: none; color: #333; }
+.nav-links a.active { font-weight: bold; color: var(--primary-color); }
+
+/* src/index.css (在末尾追加) */
+
+.page-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.profile-form {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 3rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.interest-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.interest-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f0f0f0;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.interest-tag input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.save-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.status-message {
+  margin-top: 1rem;
+  color: green;
+}
+
+.favorites-title {
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Markdown 渲染样式 */
+.ai-message p {
+  margin: 0 0 0.5rem 0;
+}
+.ai-message p:last-child {
+  margin-bottom: 0;
+}
+.ai-message ul, .ai-message ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+.ai-message pre {
+  margin: 0;
+  border-radius: 8px;
+}
+.ai-message code {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+}
+.ai-message pre code {
+  padding: 0;
+  background-color: transparent;
+}
+
+/* Gemini风格输入框样式 */
+.chat-form-container {
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-color);
+}
+.chat-form-gemini {
+  display: flex;
+  align-items: flex-end; /* 按钮和文本框底部对齐 */
+  background-color: #f0f4f9;
+  border-radius: 28px; /* 圆角 */
+  padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.chat-form-gemini textarea {
+  flex-grow: 1;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  resize: none; /* 禁止用户手动调整大小 */
+  font-size: 1rem;
+  font-family: inherit;
+  line-height: 1.5;
+  max-height: 200px; /* 限制最大高度 */
+  overflow-y: auto; /* 内容超出时显示滚动条 */
+  color: var(--text-color);
+}
+.chat-form-gemini button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%; /* 圆形按钮 */
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: background-color 0.2s;
+}
+.chat-form-gemini button:hover {
+  background-color: #3a7ac8;
+}
+.chat-form-gemini button:disabled {
+  background-color: #a0c3ed;
+  cursor: not-allowed;
+}
+
+/* 请用这个新样式替换掉旧的 .reset-button 样式 */
+.reset-button {
+  /* 使用Flexbox来对齐图标和文字 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem; /* 图标和文字之间的间距 */
+
+  /* 核心样式 */
+  background-color: transparent; /* 透明背景 */
+  color: var(--primary-color);   /* 蓝色文字 */
+  border: 1px solid var(--primary-color); /* 蓝色边框 */
+  
+  /* 尺寸和字体 */
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  font-weight: 500;
+  
+  /* 交互效果 */
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.reset-button svg {
+  /* 让SVG图标的颜色跟随文字颜色变化 */
+  stroke: currentColor;
+}
+
+/* 鼠标悬停时的样式 */
+.reset-button:hover {
+  background-color: var(--primary-color); /* 蓝色背景 */
+  color: white; /* 白色文字 */
+}
+
+/* src/index.css (在末尾追加) */
+
+/* 应用总容器布局 */
+.app-container {
+  display: flex;
+  flex-direction: column; /* 垂直排列：导航栏在上，主内容在下 */
+  height: 100vh; /* 占满整个视口高度 */
+}
+
+/* 导航栏样式已存在，无需修改 */
+
+/* 主内容区域布局 */
+.main-content {
+  flex-grow: 1; /* 让主内容区域占据所有剩余的垂直空间 */
+  overflow-y: auto; /* 如果内容超长，主内容区内部滚动，而不是整个页面滚动 */
+}
+
+/* --- 这是针对聊天页面布局的关键修改 --- */
+/* 让聊天页面的三栏布局高度占满其父容器(main-content)，而不是整个视口 */
+.app-layout {
+  height: 100%; /* 从 100vh 改为 100% */
+}

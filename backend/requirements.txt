@@ -1,0 +1,10 @@
+# backend/requirements.txt
+
+fastapi
+uvicorn[standard]
+python-dotenv
+langchain
+langchain-openai
+
+# 用于允许前端访问后端API
+python-multipart
