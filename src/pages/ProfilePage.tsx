@@ -58,9 +58,12 @@ const ProfilePage: React.FC = () => {
     if (!editableProfile) return;
     setStatusMessage('正在保存...');
     try {
-      await updateProfile(editableProfile);
+      const updated = await updateProfile(editableProfile);
       setStatusMessage('个人资料已成功保存！');
-      refreshProfile(); // 关键：保存成功后，调用 context 的刷新方法
+      if (updated) {
+        localStorage.setItem('profile-local', JSON.stringify(updated));
+      }
+      refreshProfile();
     } catch (error) {
       setStatusMessage('保存失败，请重试。');
     }
