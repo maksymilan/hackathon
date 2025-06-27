@@ -5,12 +5,16 @@ import { updateProfile, getCards, toggleFavorite } from '../services/api';
 import type { CardData } from '../types';
 import Card from '../components/Card';
 import { useUser } from '../contexts/UserContext'; // 引入 useUser
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // 可供选择的兴趣领域
 const INTEREST_OPTIONS = ["Python", "数据科学", "Web开发", "游戏开发", "网络爬虫", "人工智能"];
 
 const ProfilePage: React.FC = () => {
   const { profile, isLoading: isProfileLoading, refreshProfile } = useUser(); // 从Context获取用户数据
+  const { logout, username } = useAuth();
+  const navigate = useNavigate();
   const [cards, setCards] = useState<CardData[]>([]);
   const [editableProfile, setEditableProfile] = useState(profile);
   const [isCardsLoading, setIsCardsLoading] = useState(true);
@@ -83,7 +87,6 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="page-container profile-page">
       <h1>个人中心</h1>
-      
       <form onSubmit={handleSaveProfile} className="profile-form">
         <div className="form-group">
           <label htmlFor="nickname">昵称</label>
@@ -91,7 +94,7 @@ const ProfilePage: React.FC = () => {
             type="text"
             id="nickname"
             name="nickname"
-            value={editableProfile.nickname}
+            value={editableProfile.nickname || username || ''}
             onChange={handleInputChange}
           />
         </div>
@@ -124,6 +127,7 @@ const ProfilePage: React.FC = () => {
         <button type="submit" className="save-button">保存更改</button>
         {statusMessage && <p className="status-message">{statusMessage}</p>}
       </form>
+      <button className="logout-btn" onClick={() => { logout(); navigate('/login'); }}>退出登录</button>
 
       <h2 className="favorites-title">我收藏的学习卡片</h2>
       <div className="card-container">

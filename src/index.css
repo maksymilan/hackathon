@@ -1802,3 +1802,97 @@ p {
     margin-right: 15pt;
     margin-top: 15pt;
 }
+
+/* 登录页美化 */
+.login-bg {
+  min-height: 100vh;
+  background: var(--primary-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-card {
+  background: var(--card-bg-color);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem 2rem 2rem;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.login-title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.login-input {
+  width: 92.7%;
+  padding: 0.7rem 1rem;
+  /* padding-right: 0.7em; */
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+  outline: none;
+  transition: border var(--transition-fast);
+}
+.login-input:focus {
+  border: 1.5px solid var(--primary-color);
+}
+.login-btn {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  /* padding-right: 0.7em; */
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--primary-gradient);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  margin-bottom: 0.5rem;
+}
+.login-btn:disabled {
+  background: #cbd5e1;
+  color: #fff;
+  cursor: not-allowed;
+}
+.login-error {
+  color: var(--error-color);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* 个人中心退出按钮美化 */
+.logout-btn {
+  display: block;
+  margin: 2rem auto 0 auto;
+  padding: 0.7rem 2.5rem;
+  background: var(--secondary-gradient);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.logout-btn:hover {
+  background: var(--primary-gradient);
+  transform: translateY(-2px) scale(1.04);
+}
+
+.login-success {
+  color: var(--success-color);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}

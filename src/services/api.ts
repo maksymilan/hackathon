@@ -54,6 +54,15 @@ export const toggleFavorite = async (cardId: string): Promise<CardData | null> =
 };
 
 export const getProfile = async (): Promise<ProfileData | null> => {
+    // 优先从 localStorage 读取
+    const local = localStorage.getItem('profile-local');
+    if (local) {
+        try {
+            return JSON.parse(local);
+        } catch {
+            // ignore parse error, fallback to backend
+        }
+    }
     try {
         const response = await fetch(`${API_BASE_URL}/profile`);
         if (!response.ok) throw new Error('Failed to fetch profile');

@@ -3,10 +3,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import NavigationBar from './components/NavigationBar';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard.tsx';
 import ProfilePage from './pages/ProfilePage';
 import ChatSpace from './pages/ChatSpace';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import { UserProvider } from './contexts/UserContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // AppLayout 现在是所有页面的"外壳"
 const AppLayout: React.FC = () => (
@@ -18,20 +21,33 @@ const AppLayout: React.FC = () => (
   </div>
 );
 
+// 路由保护组件
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isLoggedIn } = useAuth();
+  if (!isLoggedIn) {
+    window.location.href = '/login';
+    return null;
+  }
+  return <>{children}</>;
+};
+
 const App: React.FC = () => {
   return (
-    <UserProvider>
-      <Router>
-        <Routes>
-          {/* --- 关键修改：将ChatSpace也移入AppLayout中 --- */}
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/chat/:topic" element={<ChatSpace />} />
-          </Route>
-        </Routes>
-      </Router>
-    </UserProvider>
+    <AuthProvider>
+      <UserProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/chat/:topic" element={<ProtectedRoute><ChatSpace /></ProtectedRoute>} />
+            </Route>
+          </Routes>
+        </Router>
+      </UserProvider>
+    </AuthProvider>
   );
 };
 
